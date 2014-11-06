@@ -1,4 +1,3 @@
-// ADI WAS HERE!!!
 #include <time.h>
 
 #include <fcntl.h>
