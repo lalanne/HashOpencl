@@ -25,9 +25,14 @@ unsigned int test_results(const float* const a,
                         const float* const b,
                         const float* const results);
 
+const unsigned int LEN = 4;
+const unsigned int INITVAL = 0;
+
 int main(int argc, char** argv){
     // error code returned from api calls
     int err;                            
+
+    char key[] = {'l', 'o', 'c', 'o'};
      
     size_t global[2];// global domain size for our calculation
     size_t local[2];// local domain size for our calculation
@@ -185,10 +190,39 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    cl_mem d_key;
+    d_key = clCreateBuffer(context,  
+                        CL_MEM_READ_ONLY,  
+                        sizeof(char)*LEN, 
+                        NULL, 
+                        NULL);
+    err = clEnqueueWriteBuffer(commands, 
+                            d_key, 
+                            CL_TRUE, 
+                            0, 
+                            sizeof(char)*LEN, 
+                            key, 
+                            0, 
+                            NULL, 
+                            NULL);
+    if (err != CL_SUCCESS){
+        printf("Error: Failed to write to device key array!\n");
+        exit(1);
+    }
+
     global[0] = 4;
     global[1] = 4;
     local[0] = wgSize1D;
     local[1] = wgSize2D;
+
+    err = 0;
+    err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_key);
+    err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &LEN);
+    err |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &INITVAL);
+    if (err != CL_SUCCESS){
+        printf("Error: Failed to set kernel arguments! %d\n", err);
+        exit(1);
+    }
 
     err = clEnqueueNDRangeKernel(commands, 
                                 kernel, 
