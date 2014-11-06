@@ -220,7 +220,11 @@ int show_info(cl_platform_id platform_id){
     char cl_platform_name[1001];
     char cl_platform_version[1001];
 
-    err = clGetPlatformInfo(platform_id,CL_PLATFORM_VENDOR,1000,(void *)cl_platform_vendor,NULL);
+    err = clGetPlatformInfo(platform_id,
+                            CL_PLATFORM_VENDOR,
+                            1000,
+                            (void *)cl_platform_vendor,
+                            NULL);
     if (err != CL_SUCCESS){
         printf("Error: clGetPlatformInfo(CL_PLATFORM_VENDOR) failed!\n");
         printf("Test failed\n");
@@ -228,7 +232,11 @@ int show_info(cl_platform_id platform_id){
     }
     printf("CL_PLATFORM_VENDOR %s\n",cl_platform_vendor);
   
-    err = clGetPlatformInfo(platform_id,CL_PLATFORM_NAME,1000,(void *)cl_platform_name,NULL);
+    err = clGetPlatformInfo(platform_id,
+                            CL_PLATFORM_NAME,
+                            1000,
+                            (void *)cl_platform_name,
+                            NULL);
     if (err != CL_SUCCESS){
         printf("Error: clGetPlatformInfo(CL_PLATFORM_NAME) failed!\n");
         printf("Test failed\n");
@@ -236,14 +244,17 @@ int show_info(cl_platform_id platform_id){
     }
     printf("CL_PLATFORM_NAME %s\n",cl_platform_name);
     
-    err = clGetPlatformInfo(platform_id,CL_PLATFORM_VERSION,1000,(void *)cl_platform_version,NULL);
+    err = clGetPlatformInfo(platform_id,
+                            CL_PLATFORM_VERSION,
+                            1000,
+                            (void *)cl_platform_version,
+                            NULL);
     if (err != CL_SUCCESS){
         printf("Error: clGetPlatformInfo(CL_PLATFORM_VERSION) failed!\n");
         printf("Test failed\n");
         return EXIT_FAILURE;
     }
     printf("CL_PLATFORM_VERSION %s\n",cl_platform_version);
-
     return SUCCESS;
 }
 
