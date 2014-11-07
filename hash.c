@@ -32,7 +32,8 @@ int main(int argc, char** argv){
     // error code returned from api calls
     int err;                            
 
-    char key[] = {'l', 'o', 'c', 'o'};
+    char key[] = {'m', 'o', 'n', 'a'};
+    unsigned int out[] = {0};
      
     size_t global[2];// global domain size for our calculation
     size_t local[2];// local domain size for our calculation
@@ -191,11 +192,18 @@ int main(int argc, char** argv){
     }
 
     cl_mem d_key;
+    cl_mem d_out;
     d_key = clCreateBuffer(context,  
                         CL_MEM_READ_ONLY,  
                         sizeof(char)*LEN, 
                         NULL, 
                         NULL);
+    d_out = clCreateBuffer(context,  
+                        CL_MEM_WRITE_ONLY,  
+                        sizeof(unsigned int)*1, 
+                        NULL, 
+                        NULL);
+
     err = clEnqueueWriteBuffer(commands, 
                             d_key, 
                             CL_TRUE, 
@@ -219,6 +227,7 @@ int main(int argc, char** argv){
     err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_key);
     err |= clSetKernelArg(kernel, 1, sizeof(unsigned int), &LEN);
     err |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &INITVAL);
+    err |= clSetKernelArg(kernel, 3, sizeof(unsigned int), &d_out);
     if (err != CL_SUCCESS){
         printf("Error: Failed to set kernel arguments! %d\n", err);
         exit(1);
@@ -238,6 +247,26 @@ int main(int argc, char** argv){
         printf("Test failed\n");
         return EXIT_FAILURE;
     }
+
+    cl_event readevent;
+    err = clEnqueueReadBuffer(commands,                                             
+                            d_out,
+                            CL_TRUE,                                                 
+                            0,
+                            sizeof(unsigned int) * 1,
+                            out,
+                            0,                           
+                            NULL,
+                            &readevent);
+    if (err != CL_SUCCESS){ 
+        printf("Error: Failed to read output array! %d\n", err);                    
+        printf("Test failed\n");                                                   
+        return EXIT_FAILURE;                                                     
+    }                                                                             
+                                                                             
+    clWaitForEvents(1, &readevent); 
+
+    printf("result[%u]\n", out[0]);
 
     // Shutdown and cleanup
     clReleaseProgram(program);
